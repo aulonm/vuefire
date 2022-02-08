@@ -1,6 +1,12 @@
 import firebase from 'firebase'
 import { bindDocument } from '../../../src/core'
-import { spyUnbind, createOps, initFirebase, generateRandomID } from '../../src'
+import {
+  spyUnbind,
+  createOps,
+  initFirebase,
+  generateRandomID,
+  delay,
+} from '../../src'
 import * as firestore from '@firebase/firestore-types'
 import { OperationsType } from '../../../src/shared'
 import { ref, Ref } from 'vue'
@@ -20,14 +26,16 @@ describe('documents', () => {
   beforeEach(async () => {
     collection = firebase.firestore().collection(generateRandomID())
     document = collection.doc()
-    await document.set({})
+
     ops = createOps()
     target = ref({})
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindDocument(target, document, ops, resolve, reject)
     })
+
+    await delay(200)
   })
 
   it('does not call anything if document does not exist', () => {
@@ -42,8 +50,8 @@ describe('documents', () => {
     // @ts-ignore
     target.value = 'foo'
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindDocument(target, collection.doc(), ops, resolve, reject)
     })
     expect(target.value).toBe(null)
@@ -51,7 +59,7 @@ describe('documents', () => {
   })
 
   it('updates a document', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     expect(ops.add).not.toHaveBeenCalled()
     expect(ops.set).toHaveBeenCalledTimes(2)
     expect(ops.set).toHaveBeenLastCalledWith(target, 'value', { foo: 'foo' })
@@ -65,20 +73,21 @@ describe('documents', () => {
   })
 
   it('sets to null when deleted', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     await document.delete()
     expect(target.value).toBe(null)
   })
 
   it('adds non-enumerable id', async () => {
-    document = collection.doc('some-id')
+    const docID = generateRandomID()
+    document = collection.doc(docID)
     bindDocument(target, document, ops, resolve, reject)
     await document.set({ foo: 'foo' })
     expect(Object.getOwnPropertyDescriptor(target.value, 'id')).toEqual({
       configurable: false,
       enumerable: false,
       writable: false,
-      value: 'some-id',
+      value: docID,
     })
   })
 
@@ -112,7 +121,7 @@ describe('documents', () => {
     }
     document = collection.doc()
     // @ts-ignore
-    document.onSnapshot = jest.fn(fakeOnSnapshot)
+    document.onSnapshot = vi.fn(fakeOnSnapshot)
     await expect(
       new Promise((resolve, reject) => {
         bindDocument(target, document, ops, resolve, reject)
@@ -123,7 +132,7 @@ describe('documents', () => {
   })
 
   it('resolves when the document is set', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     const promise = new Promise((resolve, reject) => {
       bindDocument(target, document, ops, resolve, reject)
     })
@@ -132,7 +141,7 @@ describe('documents', () => {
   })
 
   it('resets the value when unbinding', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     let unbind: ReturnType<typeof bindDocument> = () => {
       throw new Error('Promise was not called')
     }
@@ -146,7 +155,7 @@ describe('documents', () => {
   })
 
   it('can be left as is with reset: false', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     let unbind: ReturnType<typeof bindDocument> = () => {
       throw new Error('Promise was not called')
     }
@@ -160,7 +169,7 @@ describe('documents', () => {
   })
 
   it('can be reset to a specific value', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     let unbind: ReturnType<typeof bindDocument> = () => {
       throw new Error('Promise was not called')
     }
@@ -174,7 +183,7 @@ describe('documents', () => {
   })
 
   it('ignores reset option in bind when calling unbind', async () => {
-    await document.update({ foo: 'foo' })
+    await document.set({ foo: 'foo' })
     let unbind: ReturnType<typeof bindDocument> = () => {
       throw new Error('Promise was not called')
     }

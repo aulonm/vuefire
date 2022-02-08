@@ -46,7 +46,7 @@ describe('Firestore: firestore option', () => {
   })
 
   it('ignores no return', () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     mount(
       {
         template: 'no',

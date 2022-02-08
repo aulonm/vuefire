@@ -31,7 +31,7 @@ describe('RTDB: plugin options', () => {
 
   it('calls custom serialize function with collection', async () => {
     const pluginOptions = {
-      serialize: jest.fn(() => ({ foo: 'bar' })),
+      serialize: vi.fn(() => ({ foo: 'bar' })),
     }
     const { vm } = mount(
       {
@@ -62,7 +62,7 @@ describe('RTDB: plugin options', () => {
 
   it('can be ovrriden by local option', async () => {
     const pluginOptions = {
-      serialize: jest.fn(() => ({ foo: 'bar' })),
+      serialize: vi.fn(() => ({ foo: 'bar' })),
     }
 
     const items = firebase.database().ref(generateRandomID())
@@ -78,7 +78,7 @@ describe('RTDB: plugin options', () => {
       }
     )
 
-    const spy = jest.fn(() => ({ bar: 'bar' }))
+    const spy = vi.fn(() => ({ bar: 'bar' }))
 
     const p = vm.$rtdbBind('items', items, { serialize: spy })
     await items.push({ text: 'foo' })

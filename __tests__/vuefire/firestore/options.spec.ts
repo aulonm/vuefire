@@ -31,7 +31,7 @@ describe('Firestore: plugin options', () => {
 
   it('calls custom serialize function with collection', async () => {
     const pluginOptions = {
-      serialize: jest.fn(() => ({ foo: 'bar' })),
+      serialize: vi.fn(() => ({ foo: 'bar' })),
     }
     const wrapper = mount(
       {
@@ -59,7 +59,7 @@ describe('Firestore: plugin options', () => {
 
   it('can be overridden by local option', async () => {
     const pluginOptions = {
-      serialize: jest.fn(() => ({ foo: 'bar' })),
+      serialize: vi.fn(() => ({ foo: 'bar' })),
     }
     const wrapper = mount(
       {
@@ -76,7 +76,7 @@ describe('Firestore: plugin options', () => {
     const items = firebase.firestore().collection(generateRandomID())
     await items.add({})
 
-    const spy = jest.fn(() => ({ bar: 'bar' }))
+    const spy = vi.fn(() => ({ bar: 'bar' }))
 
     await wrapper.vm.$bind('items', items, { serialize: spy })
 

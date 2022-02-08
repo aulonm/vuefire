@@ -27,8 +27,8 @@ describe('RTDB document', () => {
     document = firebase.database().ref(generateRandomID())
     target = ref({})
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       unbind = rtdbBindAsObject({
         target,
         document,

@@ -20,8 +20,8 @@ describe('RTDB collection', () => {
     collection = firebase.database().ref(generateRandomID())
     target = ref([])
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       unbind = rtdbBindAsArray({
         target,
         collection,
@@ -92,8 +92,8 @@ describe('RTDB collection', () => {
     // collection.flush()
 
     const originalOn = collection.on
-    let childChangedCb = jest.fn()
-    const mock = jest.spyOn(collection, 'on').mockImplementation(
+    let childChangedCb = vi.fn()
+    const mock = vi.spyOn(collection, 'on').mockImplementation(
       // @ts-ignore
       (name, ...args) => {
         if (name === 'child_moved') {
@@ -106,8 +106,8 @@ describe('RTDB collection', () => {
     )
 
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       rtdbBindAsArray({
         target,
         collection,

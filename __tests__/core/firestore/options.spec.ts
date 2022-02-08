@@ -28,10 +28,10 @@ describe('options', () => {
   })
 
   it('allows customizing serialize when calling bindDocument', async () => {
-    const spy = jest.fn(() => ({ bar: 'foo' }))
+    const spy = vi.fn(() => ({ bar: 'foo' }))
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindDocument(target, document, ops, resolve, reject, { serialize: spy })
     })
     expect(spy).toHaveBeenCalledTimes(1)
@@ -42,10 +42,10 @@ describe('options', () => {
   })
 
   it('allows customizing serialize when calling bindCollection', async () => {
-    const spy = jest.fn(() => ({ bar: 'foo' }))
+    const spy = vi.fn(() => ({ bar: 'foo' }))
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindCollection(target, collection, ops, resolve, reject, {
         serialize: spy,
       })
@@ -59,11 +59,11 @@ describe('options', () => {
 
   it('can set options globally for bindDocument', async () => {
     const { serialize } = firestoreOptions
-    const spy = jest.fn(() => ({ bar: 'foo' }))
+    const spy = vi.fn(() => ({ bar: 'foo' }))
     firestoreOptions.serialize = spy
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindDocument(target, document, ops, resolve, reject)
     })
     expect(spy).toHaveBeenCalledTimes(1)
@@ -77,11 +77,11 @@ describe('options', () => {
 
   it('can set options globally for bindCollection', async () => {
     const { serialize } = firestoreOptions
-    const spy = jest.fn(() => ({ bar: 'foo' }))
+    const spy = vi.fn(() => ({ bar: 'foo' }))
     firestoreOptions.serialize = spy
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       bindCollection(target, collection, ops, resolve, reject)
     })
     expect(spy).toHaveBeenCalledTimes(1)

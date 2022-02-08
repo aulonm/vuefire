@@ -1,6 +1,12 @@
 import firebase from 'firebase'
 import { bindCollection } from '../../../src/core'
-import { createOps, generateRandomID, initFirebase, spyUnbind } from '../../src'
+import {
+  createOps,
+  delay,
+  generateRandomID,
+  initFirebase,
+  spyUnbind,
+} from '../../src'
 import * as firestore from '@firebase/firestore-types'
 import { OperationsType } from '../../../src/core'
 import { ref, Ref } from 'vue'
@@ -22,8 +28,8 @@ describe('collections', () => {
     target = ref({})
     ops = createOps()
     await new Promise((res, rej) => {
-      resolve = jest.fn(res)
-      reject = jest.fn(rej)
+      resolve = vi.fn(res)
+      reject = vi.fn(rej)
       unbind = bindCollection(target, collection, ops, resolve, reject)
     })
   })
@@ -35,13 +41,17 @@ describe('collections', () => {
 
   it('add elements', async () => {
     await collection.add({ text: 'foo' })
+    await delay(200)
+
     expect(ops.add).toHaveBeenCalledTimes(1)
     expect(ops.add).toHaveBeenLastCalledWith(target.value, 0, {
       text: 'foo',
     })
     await collection.add({ text: 'bar' })
+    await delay(200)
+
     expect(ops.add).toHaveBeenCalledTimes(2)
-    expect(ops.add).toHaveBeenLastCalledWith(target.value, 1, {
+    expect(ops.add).toHaveBeenLastCalledWith(target.value, 0, {
       text: 'bar',
     })
   })
@@ -83,7 +93,7 @@ describe('collections', () => {
   it.skip('unbinds when the instance is destroyed', async () => {
     expect(target.value._firestoreUnbinds).toBeTruthy()
     expect(target.value.items).toEqual([])
-    const spy = jest.spyOn(target.value._firestoreUnbinds, 'items')
+    const spy = vi.spyOn(target.value._firestoreUnbinds, 'items')
     expect(() => {
       target.value.$destroy()
     }).not.toThrow()
@@ -142,7 +152,7 @@ describe('collections', () => {
 
     collection = firebase.firestore().collection(generateRandomID())
     // @ts-ignore
-    collection.onSnapshot = jest.fn(fakeOnSnapshot)
+    collection.onSnapshot = vi.fn(fakeOnSnapshot)
     await expect(
       new Promise((resolve, reject) => {
         bindCollection(target, collection, ops, resolve, reject)
